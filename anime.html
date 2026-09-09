@@ -1,171 +1,19 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+    <meta name="description" content="KAIRO — Detalhes do anime.">
+
     <title>KAIRO — Anime</title>
 
     <link rel="stylesheet" href="style.css">
-
-    <style>
-        .anime-page {
-            width: 90%;
-            max-width: 1400px;
-            margin: auto;
-            padding: 40px 0 80px;
-        }
-
-        .back-link {
-            display: inline-block;
-            margin-bottom: 25px;
-            color: var(--muted);
-        }
-
-        .back-link:hover {
-            color: white;
-        }
-
-        .anime-details {
-            display: grid;
-            grid-template-columns: 280px 1fr;
-            gap: 40px;
-        }
-
-        .anime-poster-large {
-            width: 100%;
-            border-radius: 15px;
-            display: block;
-        }
-
-        .anime-title-large {
-            font-size: clamp(32px, 5vw, 55px);
-            margin-bottom: 18px;
-        }
-
-        .anime-meta-details {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        .detail-badge {
-            padding: 8px 12px;
-            border-radius: 8px;
-            background: var(--card);
-            border: 1px solid var(--border);
-            color: var(--muted);
-            font-size: 14px;
-        }
-
-        .detail-rating {
-            color: #FFD75A;
-        }
-
-        .genres-details {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin-bottom: 25px;
-        }
-
-        .genre-detail {
-            padding: 7px 11px;
-            border-radius: 8px;
-
-            color: var(--light-purple);
-
-            background: rgba(124, 92, 255, 0.12);
-            border: 1px solid rgba(124, 92, 255, 0.25);
-
-            font-size: 13px;
-        }
-
-        .synopsis-title {
-            margin-bottom: 10px;
-        }
-
-        .synopsis-details {
-            max-width: 900px;
-            color: var(--muted);
-            line-height: 1.8;
-            margin-bottom: 30px;
-        }
-
-        .favorite-button {
-            padding: 12px 18px;
-
-            border: 0;
-            border-radius: 10px;
-
-            background: var(--purple);
-            color: white;
-
-            font-weight: 700;
-            cursor: pointer;
-        }
-
-        .trailer-section {
-            margin-top: 50px;
-        }
-
-        .trailer-section h2 {
-            margin-bottom: 18px;
-        }
-
-        .trailer {
-            width: 100%;
-            max-width: 1000px;
-            aspect-ratio: 16 / 9;
-
-            border-radius: 15px;
-            overflow: hidden;
-
-            background: #08080D;
-        }
-
-        .trailer iframe {
-            width: 100%;
-            height: 100%;
-            border: 0;
-        }
-
-        .loading {
-            min-height: 60vh;
-
-            display: flex;
-            align-items: center;
-            justify-content: center;
-
-            color: var(--muted);
-            font-size: 18px;
-        }
-
-        @media (max-width: 700px) {
-
-            .anime-page {
-                width: 92%;
-                padding-top: 25px;
-            }
-
-            .anime-details {
-                grid-template-columns: 1fr;
-                gap: 25px;
-            }
-
-            .anime-poster-large {
-                width: 190px;
-                margin: auto;
-            }
-        }
-    </style>
 </head>
-
 
 <body>
 
+    <!-- CABEÇALHO -->
     <header class="header">
 
         <a href="index.html" class="logo">
@@ -173,395 +21,132 @@
             <span>KAIRO</span>
         </a>
 
-        <a href="index.html" class="back-link">
-            ← Voltar
-        </a>
+        <nav class="nav">
+            <a href="index.html#inicio">Início</a>
+            <a href="index.html#populares">Populares</a>
+            <a href="index.html#avaliados">Mais avaliados</a>
+            <a href="index.html#lancamentos">Lançamentos</a>
+        </nav>
+
+        <button class="menu-button" id="menu-button" aria-label="Abrir menu">
+            ☰
+        </button>
 
     </header>
 
 
+    <!-- CONTEÚDO -->
     <main class="anime-page">
 
-        <div id="loading" class="loading">
-            🔄 Carregando anime...
-        </div>
+        <section class="anime-details">
 
+            <div id="anime-loading" class="loading">
+                Carregando informações...
+            </div>
 
-        <div id="anime-content" style="display: none;">
+            <div id="anime-content" class="anime-content hidden">
 
-            <a href="index.html" class="back-link">
-                ← Voltar para o catálogo
-            </a>
-
-
-            <section class="anime-details">
-
-                <div>
-
-                    <img
-                        id="anime-poster"
-                        class="anime-poster-large"
-                        src=""
-                        alt=""
-                    >
-
+                <div class="anime-cover">
+                    <img id="anime-image" src="" alt="">
                 </div>
 
 
-                <div>
+                <div class="anime-main-info">
 
-                    <h1
-                        id="anime-title"
-                        class="anime-title-large">
+                    <span class="anime-type" id="anime-type">
+                        Anime
+                    </span>
+
+                    <h1 id="anime-title">
+                        Carregando...
                     </h1>
 
+                    <div class="anime-meta">
 
-                    <div class="anime-meta-details">
-
-                        <span
-                            id="anime-rating"
-                            class="detail-badge detail-rating">
+                        <span id="anime-rating">
+                            ⭐ —
                         </span>
 
-                        <span
-                            id="anime-episodes"
-                            class="detail-badge">
+                        <span id="anime-episodes">
+                            🎬 —
                         </span>
 
-                        <span
-                            id="anime-year"
-                            class="detail-badge">
+                        <span id="anime-year">
+                            📅 —
                         </span>
 
-                        <span
-                            id="anime-status"
-                            class="detail-badge">
+                        <span id="anime-status">
+                            —
                         </span>
 
                     </div>
 
 
-                    <div
-                        id="anime-genres"
-                        class="genres-details">
-                    </div>
+                    <div id="anime-genres" class="genres"></div>
 
 
-                    <h3 class="synopsis-title">
-                        Sinopse
-                    </h3>
-
-
-                    <p
-                        id="anime-synopsis"
-                        class="synopsis-details">
+                    <p id="anime-synopsis" class="anime-synopsis">
+                        Carregando sinopse...
                     </p>
 
 
-                    <button
-                        id="favorite-button"
-                        class="favorite-button">
+                    <button id="favorite-button" class="button primary">
                         ＋ Minha lista
                     </button>
 
                 </div>
 
-            </section>
+            </div>
+
+        </section>
 
 
-            <section
-                id="trailer-section"
-                class="trailer-section"
-                style="display: none;">
+        <!-- TRAILER -->
+        <section id="trailer-section" class="anime-section hidden">
 
-                <h2>🎬 Trailer</h2>
+            <div class="section-header">
 
-                <div
-                    id="trailer"
-                    class="trailer">
+                <div class="section-title">
+                    <span class="section-label">▶</span>
+
+                    <div>
+                        <h2>Trailer</h2>
+                        <span class="section-description">
+                            Assista ao trailer do anime
+                        </span>
+                    </div>
                 </div>
 
-            </section>
+            </div>
 
-        </div>
+            <div class="trailer-container">
+                <iframe
+                    id="anime-trailer"
+                    src=""
+                    title="Trailer do anime"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    allowfullscreen>
+                </iframe>
+            </div>
+
+        </section>
 
     </main>
 
 
-    <script>
+    <!-- RODAPÉ -->
+    <footer class="footer">
 
-        /*
-         * TESTE
-         *
-         * 21 = One Piece
-         *
-         * Por enquanto usamos um ID fixo
-         * para testar a conexão com a Jikan.
-         */
+        <strong>KAIRO</strong>
 
-        const animeId = "21";
+        <p>
+            Seu universo de anime.
+        </p>
 
+    </footer>
 
-        async function carregarAnime() {
 
-            const loading =
-                document.getElementById("loading");
-
-            try {
-
-                const resposta = await fetch(
-                    `https://api.jikan.moe/v4/anime/${animeId}/full`
-                );
-
-
-                if (!resposta.ok) {
-                    throw new Error("Erro na API");
-                }
-
-
-                const resultado =
-                    await resposta.json();
-
-
-                const anime =
-                    resultado.data;
-
-
-                /* TÍTULO */
-
-                document.getElementById(
-                    "anime-title"
-                ).textContent = anime.title;
-
-
-                /* POSTER */
-
-                document.getElementById(
-                    "anime-poster"
-                ).src =
-                    anime.images.jpg.large_image_url;
-
-
-                document.getElementById(
-                    "anime-poster"
-                ).alt = anime.title;
-
-
-                /* NOTA */
-
-                document.getElementById(
-                    "anime-rating"
-                ).textContent =
-                    `⭐ ${anime.score || "N/A"}`;
-
-
-                /* EPISÓDIOS */
-
-                document.getElementById(
-                    "anime-episodes"
-                ).textContent =
-                    `🎬 ${anime.episodes || "?"} episódios`;
-
-
-                /* ANO */
-
-                const ano =
-                    anime.year ||
-                    anime.aired?.prop?.from?.year ||
-                    "N/A";
-
-
-                document.getElementById(
-                    "anime-year"
-                ).textContent =
-                    `📅 ${ano}`;
-
-
-                /* STATUS */
-
-                document.getElementById(
-                    "anime-status"
-                ).textContent =
-                    anime.status || "N/A";
-
-
-                /* GÊNEROS */
-
-                const genres =
-                    document.getElementById(
-                        "anime-genres"
-                    );
-
-
-                genres.innerHTML = "";
-
-
-                anime.genres.forEach(genero => {
-
-                    const span =
-                        document.createElement("span");
-
-
-                    span.className =
-                        "genre-detail";
-
-
-                    span.textContent =
-                        genero.name;
-
-
-                    genres.appendChild(span);
-
-                });
-
-
-                /* SINOPSE */
-
-                document.getElementById(
-                    "anime-synopsis"
-                ).textContent =
-                    anime.synopsis ||
-                    "Sinopse não disponível.";
-
-
-                /* TRAILER */
-
-                if (anime.trailer?.youtube_id) {
-
-                    document.getElementById(
-                        "trailer-section"
-                    ).style.display = "block";
-
-
-                    document.getElementById(
-                        "trailer"
-                    ).innerHTML = `
-
-                        <iframe
-                            src="https://www.youtube.com/embed/${anime.trailer.youtube_id}"
-                            title="Trailer de ${anime.title}"
-                            allowfullscreen>
-                        </iframe>
-
-                    `;
-
-                }
-
-
-                /* MOSTRAR PÁGINA */
-
-                loading.style.display = "none";
-
-
-                document.getElementById(
-                    "anime-content"
-                ).style.display = "block";
-
-
-                document.title =
-                    `${anime.title} — KAIRO`;
-
-
-                atualizarMinhaLista();
-
-
-            } catch (erro) {
-
-                console.error(erro);
-
-
-                loading.innerHTML = `
-                    ❌ Não foi possível carregar o anime.
-                    <br><br>
-                    <small>
-                        Erro ao conectar com a Jikan.
-                    </small>
-                `;
-
-            }
-
-        }
-
-
-        /* =========================
-           MINHA LISTA
-        ========================= */
-
-        const favoriteButton =
-            document.getElementById(
-                "favorite-button"
-            );
-
-
-        function atualizarMinhaLista() {
-
-            const lista =
-                JSON.parse(
-                    localStorage.getItem(
-                        "kairoFavorites"
-                    ) || "[]"
-                );
-
-
-            if (lista.includes(animeId)) {
-
-                favoriteButton.textContent =
-                    "✓ Na minha lista";
-
-            } else {
-
-                favoriteButton.textContent =
-                    "＋ Minha lista";
-
-            }
-
-        }
-
-
-        favoriteButton.addEventListener(
-            "click",
-            () => {
-
-                let lista =
-                    JSON.parse(
-                        localStorage.getItem(
-                            "kairoFavorites"
-                        ) || "[]"
-                    );
-
-
-                if (lista.includes(animeId)) {
-
-                    lista =
-                        lista.filter(
-                            id => id !== animeId
-                        );
-
-                } else {
-
-                    lista.push(animeId);
-
-                }
-
-
-                localStorage.setItem(
-                    "kairoFavorites",
-                    JSON.stringify(lista)
-                );
-
-
-                atualizarMinhaLista();
-
-            }
-        );
-
-
-        /* INICIAR */
-
-        carregarAnime();
-
-    </script>
+    <script src="script.js"></script>
 
 </body>
-
 </html>
