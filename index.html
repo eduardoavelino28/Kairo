@@ -1,1 +1,169 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
 
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>KAIRO — Seu universo de anime.</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <header class="header">
+
+        <a href="index.html" class="logo">
+            <span class="logo-icon">K</span>
+            <span>KAIRO</span>
+        </a>
+
+        <nav class="nav">
+            <a href="#inicio">Início</a>
+            <a href="#populares">Populares</a>
+            <a href="#avaliados">Mais avaliados</a>
+            <a href="#lancamentos">Lançamentos</a>
+        </nav>
+
+        <button class="menu-button" onclick="abrirMenu()">
+            ☰
+        </button>
+
+    </header>
+
+
+    <main>
+
+        <!-- HERO -->
+
+        <section id="inicio" class="hero">
+
+            <div class="hero-content">
+
+                <span class="hero-label">
+                    🔥 EM DESTAQUE
+                </span>
+
+                <h1>One Piece</h1>
+
+                <p>
+                    Acompanhe Monkey D. Luffy e sua tripulação
+                    em uma aventura pelo mundo em busca do lendário
+                    One Piece.
+                </p>
+
+                <div class="hero-buttons">
+
+                    <a href="anime.html?id=21" class="button primary">
+                        Ver detalhes
+                    </a>
+
+                    <button class="button secondary">
+                        ＋ Minha lista
+                    </button>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- POPULARES -->
+
+        <section id="populares" class="section">
+
+            <div class="section-header">
+
+                <div>
+                    <span class="section-label">🔥</span>
+                    <h2>Populares</h2>
+                </div>
+
+                <span class="section-description">
+                    Os animes mais populares
+                </span>
+
+            </div>
+
+
+            <div id="popular-grid" class="anime-grid">
+
+                <!-- Cards serão colocados pelo JavaScript -->
+
+            </div>
+
+        </section>
+
+
+        <!-- MAIS AVALIADOS -->
+
+        <section id="avaliados" class="section">
+
+            <div class="section-header">
+
+                <div>
+                    <span class="section-label">⭐</span>
+                    <h2>Mais bem avaliados</h2>
+                </div>
+
+                <span class="section-description">
+                    Os favoritos da comunidade
+                </span>
+
+            </div>
+
+
+            <div id="top-grid" class="anime-grid">
+
+                <!-- Cards serão colocados pelo JavaScript -->
+
+            </div>
+
+        </section>
+
+
+        <!-- LANÇAMENTOS -->
+
+        <section id="lancamentos" class="section">
+
+            <div class="section-header">
+
+                <div>
+                    <span class="section-label">🆕</span>
+                    <h2>Lançamentos</h2>
+                </div>
+
+                <span class="section-description">
+                    Novos animes e temporadas
+                </span>
+
+            </div>
+
+
+            <div id="new-grid" class="anime-grid">
+
+                <!-- Cards serão colocados pelo JavaScript -->
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <footer class="footer">
+
+        <strong>KAIRO</strong>
+
+        <p>Seu universo de anime.</p>
+
+    </footer>
+
+
+    <script src="script.js"></script>
+
+</body>
+
+</html>
