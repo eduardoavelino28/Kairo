@@ -1,178 +1,457 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kairo – Catálogo de anime</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Space Grotesk"', 'sans-serif'],
+          },
+          colors: {
+            bgDark: '#080914',
+            bgCard: '#101226',
+            neonBlue: '#00d2ff',
+            neonPurple: '#9d4edd',
+          },
+          boxShadow: {
+            neonBlue: '0 0 22px -2px rgba(0, 210, 255, 0.4)',
+            neonPurple: '0 0 22px -2px rgba(157, 78, 221, 0.4)',
+          }
+        }
+      }
+    }
+  </script>
 
-    <meta name="description" content="KAIRO — Seu universo de anime. Descubra animes populares, lançamentos e os mais bem avaliados.">
+  <!-- React 18 e Babel Standalone para rodar direto sem compilação prévia -->
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
-    <title>KAIRO — Seu universo de anime.</title>
-
-    <link rel="stylesheet" href="style.css">
+  <style>
+    body {
+      background-color: #080914;
+      color: #f1f5f9;
+      font-family: 'Space Grotesk', sans-serif;
+    }
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+  </style>
 </head>
+<body class="bg-bgDark text-slate-100 min-h-screen selection:bg-neonBlue selection:text-black">
+  <div id="root"></div>
 
-<body>
+  <script type="text/babel">
+    const { useState, useEffect, useRef } = React;
 
-    <!-- CABEÇALHO -->
-    <header class="header">
+    // --- Ícones SVG embutidos (dispensam bibliotecas externas) ---
+    const Icons = {
+      Star: ({ className = "w-4 h-4" }) => (
+        <svg className={className} fill="currentColor" viewBox="0 0 24 24">
+          <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
+        </svg>
+      ),
+      Play: ({ className = "w-4 h-4" }) => (
+        <svg className={className} fill="currentColor" viewBox="0 0 24 24">
+          <path d="M8 5v14l11-7z"/>
+        </svg>
+      ),
+      Plus: ({ className = "w-4 h-4" }) => (
+        <svg className={className} fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
+        </svg>
+      ),
+      Check: ({ className = "w-4 h-4" }) => (
+        <svg className={className} fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5"/>
+        </svg>
+      ),
+      Search: ({ className = "w-4 h-4" }) => (
+        <svg className={className} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/>
+        </svg>
+      ),
+      X: ({ className = "w-4 h-4" }) => (
+        <svg className={className} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      ),
+      ChevronLeft: ({ className = "w-4 h-4" }) => (
+        <svg className={className} fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5"/>
+        </svg>
+      ),
+      ChevronRight: ({ className = "w-4 h-4" }) => (
+        <svg className={className} fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"/>
+        </svg>
+      ),
+    };
 
-        <a href="index.html" class="logo">
-            <span class="logo-icon">K</span>
-            <span>KAIRO</span>
-        </a>
+    // --- Fila e controle da API (evita erros de requisição da Jikan) ---
+    const API = "https://api.jikan.moe/v4";
+    const sleep = (ms) => new Promise((res) => setTimeout(res, ms));
+    let callQueue = Promise.resolve();
+    let lastTime = 0;
 
-        <nav class="nav">
-            <a href="#inicio">Início</a>
-            <a href="#populares">Populares</a>
-            <a href="#avaliados">Mais avaliados</a>
-            <a href="#lancamentos">Lançamentos</a>
-        </nav>
+    async function apiFetch(endpoint) {
+      const task = callQueue.then(async () => {
+        const gap = Math.max(0, 750 - (Date.now() - lastTime));
+        if (gap) await sleep(gap);
 
-        <button class="menu-button" id="menu-button" aria-label="Abrir menu">
-            ☰
-        </button>
+        for (let attempt = 0; attempt < 3; attempt++) {
+          try {
+            lastTime = Date.now();
+            const res = await fetch(`${API}${endpoint}`);
+            if (res.ok) return await res.json();
+            if (res.status === 429) {
+              await sleep(1500 * (attempt + 1));
+              continue;
+            }
+            throw new Error("Falha na requisição");
+          } catch (e) {
+            if (attempt === 2) throw e;
+            await sleep(800);
+          }
+        }
+        throw new Error("Indisponível");
+      });
+      callQueue = task.catch(() => undefined);
+      return task;
+    }
 
-    </header>
+    const titleOf = (a) => a?.title_english?.trim() || a?.title || "Anime";
+    const posterOf = (a) => a?.images?.jpg?.large_image_url || a?.images?.jpg?.image_url || "";
+    const cleanList = (arr) => {
+      if (!Array.isArray(arr)) return [];
+      const seen = new Set();
+      return arr.filter((item) => {
+        const img = posterOf(item);
+        if (!img || seen.has(item.mal_id)) return false;
+        seen.add(item.mal_id);
+        return true;
+      });
+    };
 
+    const GENRES_LIST = [
+      { id: 1, label: "Ação" },
+      { id: 4, label: "Comédia" },
+      { id: 22, label: "Romance" },
+      { id: 24, label: "Sci-Fi" },
+    ];
 
-    <!-- CONTEÚDO PRINCIPAL -->
-    <main>
-
-        <!-- DESTAQUE -->
-        <section id="inicio" class="hero">
-
-            <div class="hero-content">
-
-                <span class="hero-label">
-                    🔥 EM DESTAQUE
-                </span>
-
-                <h1>One Piece</h1>
-
-                <p>
-                    Acompanhe Monkey D. Luffy e sua tripulação
-                    em uma aventura pelo mundo em busca do lendário One Piece.
-                </p>
-
-                <div class="hero-buttons">
-
-                    <a href="anime.html?id=21" class="button primary">
-                        Ver detalhes
-                    </a>
-
-                    <button class="button secondary" id="hero-favorite">
-                        ＋ Minha lista
-                    </button>
-
-                </div>
-
+    // --- Componente: Poster Card ---
+    function PosterCard({ anime, onSelect }) {
+      return (
+        <article
+          onClick={() => onSelect(anime)}
+          className="group relative w-[150px] sm:w-[175px] shrink-0 cursor-pointer select-none"
+        >
+          <div className="relative aspect-2/3 w-full overflow-hidden rounded-xl border border-slate-800 bg-bgCard transition-all duration-300 group-hover:-translate-y-1 group-hover:border-neonBlue group-hover:shadow-neonBlue">
+            <img
+              src={posterOf(anime)}
+              alt={titleOf(anime)}
+              loading="lazy"
+              className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-bgDark via-transparent to-transparent opacity-90" />
+            {anime.score && (
+              <span className="absolute top-2 right-2 flex items-center gap-1 rounded-md bg-black/75 px-1.5 py-0.5 text-xs font-bold text-neonBlue backdrop-blur-md">
+                <Icons.Star className="w-3 h-3 text-neonBlue" />
+                {anime.score.toFixed(1)}
+              </span>
+            )}
+            <div className="absolute inset-0 flex items-center justify-center opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+              <span className="flex h-11 w-11 items-center justify-center rounded-full bg-neonPurple text-white shadow-neonPurple">
+                <Icons.Play className="w-5 h-5 ml-0.5" />
+              </span>
             </div>
+          </div>
+          <h3 className="mt-2 truncate text-sm font-semibold text-slate-100 group-hover:text-neonBlue transition-colors">
+            {titleOf(anime)}
+          </h3>
+          <p className="truncate text-xs text-slate-400">
+            {anime.episodes ? `${anime.episodes} eps` : "Episódios a confirmar"}
+            {anime.genres?.[0] ? ` · ${anime.genres[0].name}` : ""}
+          </p>
+        </article>
+      );
+    }
 
+    // --- Componente: Skeleton Loading ---
+    function SkeletonCard() {
+      return (
+        <div className="w-[150px] sm:w-[175px] shrink-0 animate-pulse">
+          <div className="aspect-2/3 w-full rounded-xl border border-slate-800/80 bg-slate-900/60" />
+          <div className="mt-2 h-4 w-4/5 rounded bg-slate-900/60" />
+          <div className="mt-1 h-3 w-1/2 rounded bg-slate-900/60" />
+        </div>
+      );
+    }
+
+    // --- Componente: Carrossel Horizontal ---
+    function Carousel({ title, items = [], loading, onSelect }) {
+      const scrollRef = useRef(null);
+
+      const scroll = (dir) => {
+        if (scrollRef.current) {
+          scrollRef.current.scrollBy({ left: dir * 420, behavior: "smooth" });
+        }
+      };
+
+      return (
+        <section className="py-5">
+          <div className="mx-auto flex max-w-7xl items-center justify-between px-4 sm:px-8 mb-3">
+            <h2 className="flex items-center gap-2.5 text-lg sm:text-xl font-bold tracking-tight text-white">
+              <span className="h-5 w-1.5 rounded-full bg-gradient-to-b from-neonBlue to-neonPurple" />
+              <span>{title}</span>
+            </h2>
+            <div className="hidden sm:flex items-center gap-2">
+              <button
+                onClick={() => scroll(-1)}
+                className="flex h-8 w-8 items-center justify-center rounded-full border border-slate-800 bg-bgCard/60 text-slate-300 transition-colors hover:border-neonBlue hover:text-neonBlue"
+                aria-label="Anterior"
+              >
+                <Icons.ChevronLeft className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => scroll(1)}
+                className="flex h-8 w-8 items-center justify-center rounded-full border border-slate-800 bg-bgCard/60 text-slate-300 transition-colors hover:border-neonBlue hover:text-neonBlue"
+                aria-label="Próximo"
+              >
+                <Icons.ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+
+          <div
+            ref={scrollRef}
+            className="no-scrollbar flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 sm:px-8 scroll-smooth"
+          >
+            {loading || !items.length
+              ? Array.from({ length: 8 }).map((_, i) => <SkeletonCard key={i} />)
+              : items.map((anime) => (
+                  <div key={anime.mal_id} className="snap-start">
+                    <PosterCard anime={anime} onSelect={onSelect} />
+                  </div>
+                ))}
+          </div>
         </section>
+      );
+    }
 
+    // --- Componente: Hero Carousel (5 destaques com rotação) ---
+    function HeroSlider({ animes = [], onSelect, myList, toggleMyList }) {
+      const [index, setIndex] = useState(0);
+      const [paused, setPaused] = useState(false);
 
-        <!-- POPULARES -->
-        <section id="populares" class="section">
+      useEffect(() => {
+        if (!animes.length || paused) return;
+        const timer = setInterval(() => {
+          setIndex((prev) => (prev + 1) % animes.length);
+        }, 6000);
+        return () => clearInterval(timer);
+      }, [animes.length, paused]);
 
-            <div class="section-header">
+      if (!animes.length) {
+        return (
+          <div className="min-h-[58vh] sm:min-h-[68vh] w-full animate-pulse border-b border-slate-800 bg-slate-900/40" />
+        );
+      }
 
-                <div class="section-title">
-                    <span class="section-label">🔥</span>
+      const current = animes[index];
+      const isSaved = myList.some((a) => a.mal_id === current.mal_id);
 
-                    <div>
-                        <h2>Populares</h2>
-                        <span class="section-description">
-                            Os animes mais populares
-                        </span>
-                    </div>
-                </div>
+      return (
+        <section
+          onMouseEnter={() => setPaused(true)}
+          onMouseLeave={() => setPaused(false)}
+          className="relative min-h-[60vh] sm:min-h-[72vh] w-full overflow-hidden border-b border-slate-800 flex items-end"
+        >
+          {/* Fundo com pôster do anime ativo */}
+          <div className="absolute inset-0 -z-10">
+            <img
+              key={current.mal_id}
+              src={posterOf(current)}
+              alt={titleOf(current)}
+              className="h-full w-full object-cover object-top filter blur-xs scale-105 transition-opacity duration-700"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-bgDark via-bgDark/80 to-bgDark/40" />
+            <div className="absolute inset-0 bg-gradient-to-r from-bgDark via-bgDark/70 to-transparent" />
+          </div>
 
+          <div className="mx-auto w-full max-w-7xl px-4 sm:px-8 pb-12 pt-28 sm:pb-16 sm:pt-36">
+            <div className="max-w-2xl">
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-neonBlue/40 bg-neonBlue/10 px-3 py-1 text-xs font-semibold uppercase tracking-widest text-neonBlue">
+                Em Destaque #{index + 1}
+              </span>
+              <h1 className="mt-4 text-3xl sm:text-5xl font-extrabold tracking-tight text-white leading-tight">
+                {titleOf(current)}
+              </h1>
+              
+              <div className="mt-3 flex flex-wrap items-center gap-2 text-xs">
+                {current.score && (
+                  <span className="flex items-center gap-1 font-bold text-neonBlue bg-black/60 px-2 py-0.5 rounded border border-neonBlue/30">
+                    <Icons.Star className="w-3.5 h-3.5 text-neonBlue" />
+                    {current.score.toFixed(2)}
+                  </span>
+                )}
+                {current.episodes && (
+                  <span className="rounded border border-slate-700 bg-bgCard/60 px-2 py-0.5 text-slate-300">
+                    {current.episodes} episódios
+                  </span>
+                )}
+                {current.status && (
+                  <span className="rounded border border-slate-700 bg-bgCard/60 px-2 py-0.5 text-slate-300">
+                    {current.status}
+                  </span>
+                )}
+                {current.genres?.slice(0, 3).map((g) => (
+                  <span key={g.mal_id} className="rounded bg-neonPurple/20 border border-neonPurple/40 px-2 py-0.5 text-slate-200">
+                    {g.name}
+                  </span>
+                ))}
+              </div>
+
+              <p className="mt-4 line-clamp-3 text-sm sm:text-base text-slate-300 leading-relaxed">
+                {current.synopsis || "Sinopse não disponível para este título."}
+              </p>
+
+              <div className="mt-6 flex flex-wrap items-center gap-3">
+                <button
+                  onClick={() => onSelect(current)}
+                  className="flex items-center gap-2 rounded-full bg-neonPurple px-6 py-3 text-sm font-bold text-white shadow-neonPurple transition-all hover:scale-105 hover:bg-neonPurple/90"
+                >
+                  <Icons.Play className="w-4 h-4" /> Assistir
+                </button>
+                <button
+                  onClick={() => toggleMyList(current)}
+                  className={`flex items-center gap-2 rounded-full border px-6 py-3 text-sm font-bold backdrop-blur-md transition-all ${
+                    isSaved
+                      ? "border-neonBlue bg-neonBlue/20 text-neonBlue shadow-neonBlue"
+                      : "border-slate-700 bg-black/40 text-slate-200 hover:border-neonBlue hover:text-neonBlue"
+                  }`}
+                >
+                  {isSaved ? <Icons.Check className="w-4 h-4" /> : <Icons.Plus className="w-4 h-4" />}
+                  {isSaved ? "Na Minha Lista" : "+ Minha Lista"}
+                </button>
+              </div>
             </div>
 
-            <div id="popular-grid" class="anime-grid">
-
-                <div class="loading">
-                    Carregando animes...
-                </div>
-
+            {/* Controles do carrossel Hero */}
+            <div className="mt-8 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                {animes.map((_, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setIndex(i)}
+                    className={`h-2 rounded-full transition-all duration-300 ${
+                      i === index ? "w-8 bg-neonBlue shadow-neonBlue" : "w-2 bg-slate-700 hover:bg-slate-500"
+                    }`}
+                    aria-label={`Ir para destaque ${i + 1}`}
+                  />
+                ))}
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setIndex((prev) => (prev - 1 + animes.length) % animes.length)}
+                  className="flex h-9 w-9 items-center justify-center rounded-full border border-slate-700 bg-black/50 text-white backdrop-blur hover:border-neonBlue hover:text-neonBlue"
+                  aria-label="Destaque anterior"
+                >
+                  <Icons.ChevronLeft className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={() => setIndex((prev) => (prev + 1) % animes.length)}
+                  className="flex h-9 w-9 items-center justify-center rounded-full border border-slate-700 bg-black/50 text-white backdrop-blur hover:border-neonBlue hover:text-neonBlue"
+                  aria-label="Próximo destaque"
+                >
+                  <Icons.ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
             </div>
-
+          </div>
         </section>
+      );
+    }
 
+    // --- Componente: Modal de Detalhes ---
+    function AnimeModal({ anime, onClose, isSaved, onToggleList }) {
+      useEffect(() => {
+        if (!anime) return;
+        const handleKey = (e) => e.key === "Escape" && onClose();
+        document.addEventListener("keydown", handleKey);
+        document.body.style.overflow = "hidden";
+        return () => {
+          document.removeEventListener("keydown", handleKey);
+          document.body.style.overflow = "";
+        };
+      }, [anime, onClose]);
 
-        <!-- MAIS AVALIADOS -->
-        <section id="avaliados" class="section">
+      if (!anime) return null;
 
-            <div class="section-header">
+      return (
+        <div
+          onClick={onClose}
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm overflow-y-auto"
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="relative my-8 w-full max-w-3xl rounded-2xl border border-neonPurple/40 bg-bgCard p-5 sm:p-7 shadow-neonPurple text-slate-100"
+          >
+            <button
+              onClick={onClose}
+              className="absolute top-4 right-4 flex h-8 w-8 items-center justify-center rounded-full bg-black/60 text-slate-300 hover:text-white hover:bg-neonPurple"
+              aria-label="Fechar"
+            >
+              <Icons.X className="w-5 h-5" />
+            </button>
 
-                <div class="section-title">
-                    <span class="section-label">⭐</span>
+            <div className="grid gap-6 sm:grid-cols-[180px_1fr]">
+              <img
+                src={posterOf(anime)}
+                alt={titleOf(anime)}
+                className="aspect-2/3 w-full rounded-xl border border-slate-800 object-cover"
+              />
+              <div>
+                <h2 className="text-2xl sm:text-3xl font-extrabold text-white leading-tight">
+                  {titleOf(anime)}
+                </h2>
+                {anime.title_english && anime.title_english !== anime.title && (
+                  <p className="mt-1 text-xs text-slate-400">{anime.title}</p>
+                )}
 
-                    <div>
-                        <h2>Mais bem avaliados</h2>
-                        <span class="section-description">
-                            Os favoritos da comunidade
-                        </span>
-                    </div>
+                <div className="mt-3 flex flex-wrap items-center gap-2 text-xs">
+                  {anime.score && (
+                    <span className="flex items-center gap-1 rounded border border-neonBlue/40 bg-neonBlue/10 px-2.5 py-0.5 font-bold text-neonBlue">
+                      <Icons.Star className="w-3.5 h-3.5 text-neonBlue" />
+                      {anime.score.toFixed(2)}
+                    </span>
+                  )}
+                  <span className="rounded border border-slate-700 bg-bgDark px-2 py-0.5 text-slate-300">
+                    {anime.episodes ? `${anime.episodes} episódios` : "Episódios a confirmar"}
+                  </span>
+                  {anime.status && (
+                    <span className="rounded border border-slate-700 bg-bgDark px-2 py-0.5 text-slate-300">
+                      {anime.status}
+                    </span>
+                  )}
                 </div>
 
-            </div>
-
-            <div id="top-grid" class="anime-grid">
-
-                <div class="loading">
-                    Carregando animes...
-                </div>
-
-            </div>
-
-        </section>
-
-
-        <!-- LANÇAMENTOS -->
-        <section id="lancamentos" class="section">
-
-            <div class="section-header">
-
-                <div class="section-title">
-                    <span class="section-label">🆕</span>
-
-                    <div>
-                        <h2>Lançamentos</h2>
-                        <span class="section-description">
-                            Novos animes e temporadas
-                        </span>
-                    </div>
-                </div>
-
-            </div>
-
-            <div id="new-grid" class="anime-grid">
-
-                <div class="loading">
-                    Carregando animes...
-                </div>
-
-            </div>
-
-        </section>
-
-    </main>
-
-
-    <!-- RODAPÉ -->
-    <footer class="footer">
-
-        <strong>KAIRO</strong>
-
-        <p>
-            Seu universo de anime.
-        </p>
-
-    </footer>
-
-
-    <script src="script.js"></script>
-
-</body>
-</html>
+                {anime.genres?.length > 0 && (
+                  <div className="mt-3 flex flex-wrap gap-1.5 text-xs">
+                    {anime.genres.map((g) => (
+                      <span key={g.mal_id} className="rounded bg-neonPurple/
