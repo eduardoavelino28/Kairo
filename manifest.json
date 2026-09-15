@@ -1,7 +1,7 @@
 {
   "name": "Kairo — Catálogo de anime",
   "short_name": "Kairo",
-  "description": "Catálogo pessoal de animes",
+  "description": "Catálogo de animes",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#0a0b14",
